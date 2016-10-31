@@ -35,8 +35,19 @@ public class TwitterClient extends OAuthBaseClient {
 	public static final String REST_CONSUMER_SECRET = "Ncpy4WZy56Ukn5vrzH1yi2kzJZCfyrvNFiLpfWfBBvguWKyNWJ"; // Change this
 	public static final String REST_CALLBACK_URL = "oauth://cpsimpletweets"; // Change this (here and in manifest)
 
+	private long max_id;
+
+	public void setMax_id(long max_id) {
+		this.max_id = max_id;
+	}
+
+	public  long getMax_id() {
+		return max_id;
+	}
+
 	public TwitterClient(Context context) {
 		super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
+		max_id = -1;
 	}
 
 	// GET Method
@@ -58,7 +69,8 @@ public class TwitterClient extends OAuthBaseClient {
 		RequestParams params = new RequestParams();
 		params.put("count", 50);
 		params.put("since_id", 1);
-		//params.put("max_id", max_id);
+		if(max_id != -1)
+				params.put("max_id", max_id);
 		getClient().get(apiUrl, params, handler);
 	}
 

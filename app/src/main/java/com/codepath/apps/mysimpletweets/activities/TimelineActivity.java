@@ -73,6 +73,8 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
         rvTweets.addOnScrollListener(new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                long max_id = tweets.get(tweets.size()-1).getUid();
+                client.setMax_id(max_id);
                 populateTimeline();
             }
         });
@@ -137,6 +139,7 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
         });
     }
     private void populateTimeline(){
+
         client.getHomeTimeline(new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray json) {
@@ -146,9 +149,8 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
                             .show();
                 }
                 else {
-                    //int max_id = Integer.parseInt(tweets.get(tweets.size()-1).getId_Str());
-                    //client.setMax_id(max_id);
                     tweets.addAll(Tweet.fromJSONArray(json));
+
                     // Now we call setRefreshing(false) to signal refresh has finished
                     swipeContainer.setRefreshing(false);
                     aTweets.notifyDataSetChanged();
@@ -226,6 +228,7 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
         tweets.add(0,newTweet);
 
         aTweets.notifyDataSetChanged();
+        rvTweets.smoothScrollToPosition(0);
     }
 
 }
