@@ -91,18 +91,6 @@ public class ComposeDialogFragment extends DialogFragment implements TextView.On
         });
 
         btnTweetCompose.setOnClickListener(v -> {
-            int count = 140 - etBodyCompose.getText().length();
-           /* if(count < 0){
-                Log.d("DEBUG: ", "Can't enter more than 140 characters in a tweet.");
-                Snackbar snackbar = Snackbar.make(view.findViewById(R.id.relativeLayoutFragment), "No more than 140 characters!", Snackbar.LENGTH_SHORT);
-                View snackbarView = snackbar.getView();
-                snackbarView.setBackgroundColor(Color.rgb(29,161,242));
-                TextView textView = (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
-                textView.setTextColor(Color.WHITE);
-                textView.setGravity(Gravity.CENTER);
-                snackbar.show();
-                return;
-            }*/
             ComposeDialogListener listener = (ComposeDialogListener) getActivity();
             String status = etBodyCompose.getText().toString();
             client.updateStatus(status, new JsonHttpResponseHandler(){
@@ -142,10 +130,12 @@ public class ComposeDialogFragment extends DialogFragment implements TextView.On
                                     Log.d("DEBUG: ", "Can't enter more than 140 characters in a tweet.");
                                     tvCounterCompose.setTextColor(Color.RED);
                                     btnTweetCompose.setEnabled(false);
+                                    btnTweetCompose.setBackgroundColor(Color.LTGRAY);
                                 }
                                 else{
                                     tvCounterCompose.setTextColor(Color.rgb(29,161,242));
                                     btnTweetCompose.setEnabled(true);
+                                    btnTweetCompose.setBackgroundColor(Color.rgb(29,161,242));
                                 }
                             }
                         });

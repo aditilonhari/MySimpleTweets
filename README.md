@@ -52,6 +52,11 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 Describe any challenges encountered while building the app.
 
+- Figuring out the since_id and max_id differences for Endless scrolling was challenging task.
+- Setting toolbar title with the twitter vector icon was difficult but I could get to it. However I opted out of using it ultimately to make my app closer to the actual Android Twitter app.
+- Adding image URL's using data-binding to the project was something I tried my hands on but had to skip it given the project deadline.
+- Adding image to fab/styling fab and clearing cache was something I stumbled upon for long.
+
 ## Open-source libraries used
 
 - [Android Async HTTP](https://github.com/loopj/android-async-http) - Simple asynchronous HTTP requests with JSON parsing
