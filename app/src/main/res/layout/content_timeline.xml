@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/content_timeline"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/contentTimeline"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -14,6 +15,7 @@
             android:layout_height="match_parent">
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rvTweets"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:background="@color/background_white"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

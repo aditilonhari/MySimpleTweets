@@ -1,9 +1,8 @@
 package com.codepath.apps.mysimpletweets.fragment;
 
-import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -11,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -40,17 +38,16 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ComposeDialogFragment extends DialogFragment implements TextView.OnEditorActionListener {
 
     private static TwitterClient client;
-    ImageButton btnCancel;
-    CircleImageView ivProfileImage;
-    TextView tvUsername;
-    TextView tvTwitterHandler;
-    EditText etBodyCompose;
-    Button btnTweet;
-    TextView tvCounter;
-
-   //private FragmentComposeBinding binding;
     static Bundle bundle;
     Tweet newTweet;
+
+    CircleImageView cvProfileImageCompose;
+    TextView tvUsernameCompose;
+    TextView tvTwitterHandlerCompose;
+    TextView tvCounterCompose;
+    EditText etBodyCompose;
+    ImageButton btnCancelCompose;
+    Button btnTweetCompose;
 
     // 1. Defines the listener interface with a method passing back data result.
     public interface ComposeDialogListener {
@@ -72,8 +69,6 @@ public class ComposeDialogFragment extends DialogFragment implements TextView.On
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-       /// binding = DataBindingUtil.inflate(inflater, R.layout.fragment_compose, container, false);
-        //return binding.getRoot();
         return inflater.inflate(R.layout.fragment_compose, container);
     }
 
@@ -81,56 +76,52 @@ public class ComposeDialogFragment extends DialogFragment implements TextView.On
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         getDialog().setTitle("Compose Tweet");
+        User currentUser = (User) Parcels.unwrap(getArguments().getParcelable("user"));
 
-        tvUsername = (TextView) view.findViewById(R.id.tvUserNameCompose);
-        tvTwitterHandler = (TextView) view.findViewById(R.id.tvTwitterHandlerCompose);
-        tvCounter = (TextView) view.findViewById(R.id.tvCounterCompose);
-        ivProfileImage =(CircleImageView) view.findViewById(R.id.ivProfileImgCompose);
-        btnCancel = (ImageButton) view.findViewById(R.id.btnCancelCompose);
-        btnTweet = (Button) view.findViewById(R.id.btnTweetCompose);
+        tvUsernameCompose = (TextView) view.findViewById(R.id.tvUserNameCompose);
+        tvTwitterHandlerCompose = (TextView) view.findViewById(R.id.tvTwitterHandlerCompose);
+        tvCounterCompose = (TextView) view.findViewById(R.id.tvCounterCompose);
+        btnCancelCompose = (ImageButton) view.findViewById(R.id.btnCancelCompose);
+        btnTweetCompose = (Button) view.findViewById(R.id.btnTweetCompose);
+        cvProfileImageCompose = (CircleImageView) view.findViewById(R.id.ivProfileImgCompose);
         etBodyCompose = (EditText) view.findViewById(R.id.etBodyCompose);
 
-        etBodyCompose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                InputMethodManager inputManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
-            }
-        });
-
-        btnCancel.setOnClickListener(v -> {
+        btnCancelCompose.setOnClickListener(v -> {
             dismiss();
         });
 
-        btnTweet.setOnClickListener(v -> {
-
-            ComposeDialogListener listener = (ComposeDialogListener) getActivity();
-            if(Integer.parseInt(tvCounter.getText().toString()) < 0){
+        btnTweetCompose.setOnClickListener(v -> {
+            int count = 140 - etBodyCompose.getText().length();
+           /* if(count < 0){
                 Log.d("DEBUG: ", "Can't enter more than 140 characters in a tweet.");
-                Snackbar.make(v.findViewById(R.id.relativeLayout_fragment), "No more than 140 characters!", Snackbar.LENGTH_INDEFINITE)
-                        .show();
-            }
-            else {
-                String status = etBodyCompose.getText().toString();
-                client.updateStatus(status, new JsonHttpResponseHandler(){
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                        super.onSuccess(statusCode, headers, response);
-                        newTweet = Tweet.fromJSON(response);
-                    }
+                Snackbar snackbar = Snackbar.make(view.findViewById(R.id.relativeLayoutFragment), "No more than 140 characters!", Snackbar.LENGTH_SHORT);
+                View snackbarView = snackbar.getView();
+                snackbarView.setBackgroundColor(Color.rgb(29,161,242));
+                TextView textView = (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
+                textView.setTextColor(Color.WHITE);
+                textView.setGravity(Gravity.CENTER);
+                snackbar.show();
+                return;
+            }*/
+            ComposeDialogListener listener = (ComposeDialogListener) getActivity();
+            String status = etBodyCompose.getText().toString();
+            client.updateStatus(status, new JsonHttpResponseHandler(){
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    super.onSuccess(statusCode, headers, response);
+                    newTweet = Tweet.fromJSON(response);
+                    bundle.putParcelable("newTweet", Parcels.wrap(newTweet));
+                    listener.onFinishEditDialog(bundle);
+                    dismiss();
+                }
 
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                        super.onFailure(statusCode, headers, throwable, errorResponse);
-                        Log.d("DEBUG","No response from update status call");
-                        newTweet = null;
-                    }
-                });
-
-                bundle.putParcelable("newTweet", Parcels.wrap(newTweet));
-                listener.onFinishEditDialog(bundle);
-            }
-            dismiss();
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    super.onFailure(statusCode, headers, throwable, errorResponse);
+                    Log.d("DEBUG","No response from update status call");
+                    newTweet = null;
+                }
+            });
         });
 
         Thread t = new Thread() {
@@ -145,7 +136,17 @@ public class ComposeDialogFragment extends DialogFragment implements TextView.On
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                tvCounter.setText(Integer.toString(140 - etBodyCompose.getText().length()));
+                                int count = 140 - etBodyCompose.getText().length();
+                                tvCounterCompose.setText(Integer.toString(count));
+                                if(count < 0) {
+                                    Log.d("DEBUG: ", "Can't enter more than 140 characters in a tweet.");
+                                    tvCounterCompose.setTextColor(Color.RED);
+                                    btnTweetCompose.setEnabled(false);
+                                }
+                                else{
+                                    tvCounterCompose.setTextColor(Color.rgb(29,161,242));
+                                    btnTweetCompose.setEnabled(true);
+                                }
                             }
                         });
                     }
@@ -158,13 +159,12 @@ public class ComposeDialogFragment extends DialogFragment implements TextView.On
 
         t.start();
 
-        User currentUser = (User) Parcels.unwrap(getArguments().getParcelable("user"));
-        tvUsername.setText(currentUser.getName());
-        tvTwitterHandler.setText("@" + currentUser.getScreenName());
-        tvCounter.setText("140");
-        ivProfileImage.setImageResource(android.R.color.transparent);
+        tvUsernameCompose.setText(currentUser.getName());
+        tvTwitterHandlerCompose.setText("@" + currentUser.getScreenName());
+        tvCounterCompose.setText("140");
+        cvProfileImageCompose.setImageResource(android.R.color.transparent);
         Glide.with(getContext()).load(currentUser.getProfileImageUrl())
-                .into(ivProfileImage);
+                .into(cvProfileImageCompose);
         etBodyCompose.setHint("What's hapennings!");
     }
 

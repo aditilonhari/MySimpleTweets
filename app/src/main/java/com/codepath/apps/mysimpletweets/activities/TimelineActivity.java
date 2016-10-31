@@ -36,6 +36,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 
@@ -57,10 +58,9 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timeline);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(R.string.toolbar_title);
-        toolbar.setTitleTextColor(Color.BLACK);
 
         rvTweets = (RecyclerView) findViewById(R.id.rvTweets);
         tweets = new ArrayList<>();
@@ -92,7 +92,7 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.login, menu);
+        inflater.inflate(R.menu.menu_search, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
         Drawable drawable = searchItem.getIcon();
         drawable.setColorFilter(getResources().getColor(R.color.twitter_blue), PorterDuff.Mode.SRC_ATOP);
@@ -131,19 +131,18 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-                Snackbar.make(findViewById(R.id.content_timeline), "Current user data not available", Snackbar.LENGTH_LONG)
+                Snackbar.make(findViewById(R.id.contentTimeline), "Current user data not available", Snackbar.LENGTH_LONG)
                         .show();
             }
         });
     }
-
     private void populateTimeline(){
         client.getHomeTimeline(new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray json) {
                 Log.d("DEBUG", json.toString());
                 if(json.length() == 0){
-                    Snackbar.make(findViewById(R.id.content_timeline), "No data available", Snackbar.LENGTH_LONG)
+                    Snackbar.make(findViewById(R.id.contentTimeline), "No data available", Snackbar.LENGTH_LONG)
                             .show();
                 }
                 else {
@@ -161,7 +160,7 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
                 Log.d("DEBUG", "onResponseFailure");
                 if (!client.isNetworkAvailable()){
                     Log.d("DEBUG: ", "Network not connected");
-                    Snackbar.make(findViewById(R.id.content_timeline), "Network connectivity lost!", Snackbar.LENGTH_INDEFINITE)
+                    Snackbar.make(findViewById(R.id.contentTimeline), "Network connectivity lost!", Snackbar.LENGTH_INDEFINITE)
                         .setAction("RETRY", mOnClickListener)
                         .setActionTextColor(Color.RED)
                         .show();
@@ -169,7 +168,7 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
 
                 if (!client.isOnline()) {
                     Log.d("DEBUG: ", "Device not online. Check Internet connection!");
-                    Snackbar.make(findViewById(R.id.content_timeline), "No internet connection!", Snackbar.LENGTH_INDEFINITE)
+                    Snackbar.make(findViewById(R.id.contentTimeline), "No internet connection!", Snackbar.LENGTH_INDEFINITE)
                             .setAction("RETRY", mOnClickListener)
                             .setActionTextColor(Color.RED)
                             .show();
@@ -204,8 +203,7 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
         fab.setSize(FloatingActionButton.SIZE_AUTO);
         fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.twitter_blue)));
         Glide.with(getApplicationContext()).load(R.drawable.ic_action_compose)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.RESULT)
                 .into(fab);
         fab.setOnClickListener(view -> showComposeDialog());
 
@@ -223,11 +221,11 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
     @Override
     public void onFinishEditDialog(Bundle inputBundle) {
 
-        Tweet newTweet = inputBundle.getParcelable("newTweet");
+
+        Tweet newTweet = (Tweet) Parcels.unwrap(inputBundle.getParcelable("newTweet"));
         tweets.add(0,newTweet);
 
         aTweets.notifyDataSetChanged();
-        Snackbar.make(findViewById(R.id.content_timeline), "New Tweet!!", Snackbar.LENGTH_INDEFINITE).show();
     }
 
 }

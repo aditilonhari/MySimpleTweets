@@ -67,11 +67,12 @@ public class Tweet {
 
     // getRelativeTimeAgo("Mon Apr 01 21:16:23 +0000 2014");
     public String getRelativeTimeAgo(String rawJsonDate) {
+
         String twitterFormat = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";
         SimpleDateFormat sf = new SimpleDateFormat(twitterFormat, Locale.ENGLISH);
         sf.setLenient(true);
 
-        String relativeDate = "";
+       String relativeDate = "";
         try {
             long dateMillis = sf.parse(rawJsonDate).getTime();
             relativeDate = DateUtils.getRelativeTimeSpanString(dateMillis,
@@ -79,6 +80,9 @@ public class Tweet {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+
+
+
 
         return relativeDate;
     }

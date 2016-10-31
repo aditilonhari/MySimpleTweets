@@ -13,8 +13,6 @@ import org.scribe.builder.api.Api;
 import org.scribe.builder.api.TwitterApi;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 /*
  * 
@@ -31,8 +29,10 @@ import java.net.URLEncoder;
 public class TwitterClient extends OAuthBaseClient {
 	public static final Class<? extends Api> REST_API_CLASS = TwitterApi.class; // Change this
 	public static final String REST_URL = "https://api.twitter.com/1.1/"; // Change this, base API URL
-	public static final String REST_CONSUMER_KEY = "rhHH3lbQjft8pPFcv9D3iFscu";       // Change this
-	public static final String REST_CONSUMER_SECRET = "6uVh3xViQlr3JMmZ7b5a2k01R4GBz7trSBhSQdOzc0HEjPd7JE"; // Change this
+	//public static final String REST_CONSUMER_KEY = "rhHH3lbQjft8pPFcv9D3iFscu";       // Change this
+	public static final String REST_CONSUMER_KEY = "MlZWQPfUBTDcEJfxDf9Mm43ba";       // Change this
+	//public static final String REST_CONSUMER_SECRET = "6uVh3xViQlr3JMmZ7b5a2k01R4GBz7trSBhSQdOzc0HEjPd7JE"; // Change this
+	public static final String REST_CONSUMER_SECRET = "Ncpy4WZy56Ukn5vrzH1yi2kzJZCfyrvNFiLpfWfBBvguWKyNWJ"; // Change this
 	public static final String REST_CALLBACK_URL = "oauth://cpsimpletweets"; // Change this (here and in manifest)
 
 	public TwitterClient(Context context) {
@@ -49,18 +49,14 @@ public class TwitterClient extends OAuthBaseClient {
 	public void updateStatus(String status, AsyncHttpResponseHandler handler){
 		String apiUrl = getApiUrl("statuses/update.json");
 		RequestParams params = new RequestParams();
-		try {
-			params.put("status", URLEncoder.encode(status, "UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+		params.put("status", status);
 		getClient().post(apiUrl, params, handler);
 	}
 
 	public void getHomeTimeline(AsyncHttpResponseHandler handler){
 		String apiUrl = getApiUrl("statuses/home_timeline.json");
 		RequestParams params = new RequestParams();
-		params.put("count", 3);
+		params.put("count", 50);
 		params.put("since_id", 1);
 		//params.put("max_id", max_id);
 		getClient().get(apiUrl, params, handler);
@@ -82,6 +78,8 @@ public class TwitterClient extends OAuthBaseClient {
 		} catch (IOException | InterruptedException e) {e.printStackTrace();}
 		return false;
 	}
+
+
 
 
 	/* 1. Define the endpoint URL with getApiUrl and pass a relative path to the endpoint
