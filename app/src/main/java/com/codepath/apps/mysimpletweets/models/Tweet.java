@@ -16,7 +16,7 @@ import java.util.Locale;
  * Created by aditi on 10/25/2016.
  */
 
-@Parcel(analyze={User.class})
+@Parcel
 public class Tweet {
 
     //attributes
