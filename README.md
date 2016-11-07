@@ -57,7 +57,7 @@ The following **additional** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-<img src='https://github.com/aditilonhari/MySimpleTweets/blob/master/simpleTweetsApp.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='https://github.com/aditilonhari/MySimpleTweets/blob/fe96e3c63f16cf78c7c86a2d419c6d482a85d8f3/simpleTweetsApp.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
