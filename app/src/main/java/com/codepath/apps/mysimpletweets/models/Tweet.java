@@ -25,6 +25,9 @@ public class Tweet {
     public User user;
     public String createdAt;
     public String id_Str;
+    public int favCount;
+    public int retweetCount;
+    public String replyScreenName;
 
     public Tweet(){
 
@@ -39,6 +42,9 @@ public class Tweet {
             tweet.uid = jsonObject.getLong("id");
             tweet.createdAt = jsonObject.getString("created_at");
             tweet.id_Str = jsonObject.getString("id_str");
+            tweet.favCount = jsonObject.getInt("favorite_count");
+            tweet.retweetCount = jsonObject.getInt("retweet_count");
+            tweet.replyScreenName = jsonObject.getString("in_reply_to_screen_name");
             tweet.user = User.fromJSON(jsonObject.getJSONObject("user"));
         } catch (JSONException e) {
             e.printStackTrace();
@@ -80,20 +86,15 @@ public class Tweet {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
-
-
-
         return relativeDate;
+    }
+
+    public String getCreatedAt() {
+        return  getRelativeTimeAgo(createdAt);
     }
 
     public String getBody() {
         return body;
-    }
-
-    public String getCreatedAt() {
-        createdAt = getRelativeTimeAgo(createdAt);
-        return createdAt;
     }
 
     public long getUid() {
@@ -111,4 +112,12 @@ public class Tweet {
     public void setBody(String body) {
         this.body = body;
     }
+
+
+    public int getFavCount() { return favCount;}
+
+    public int getRetweetCount() { return retweetCount;}
+
+    public String getReplyScreenName() {   return replyScreenName;}
+
 }

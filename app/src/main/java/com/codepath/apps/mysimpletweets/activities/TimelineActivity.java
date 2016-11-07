@@ -1,5 +1,6 @@
 package com.codepath.apps.mysimpletweets.activities;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -8,12 +9,12 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -22,79 +23,74 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.astuetz.PagerSlidingTabStrip;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.codepath.apps.mysimpletweets.R;
-import com.codepath.apps.mysimpletweets.adapters.EndlessRecyclerViewScrollListener;
-import com.codepath.apps.mysimpletweets.adapters.TweetsAdapter;
-import com.codepath.apps.mysimpletweets.fragment.ComposeDialogFragment;
+import com.codepath.apps.mysimpletweets.fragments.ComposeDialogFragment;
+import com.codepath.apps.mysimpletweets.fragments.HomeTimelineFragment;
+import com.codepath.apps.mysimpletweets.fragments.MentionsTimelineFragment;
 import com.codepath.apps.mysimpletweets.models.Tweet;
 import com.codepath.apps.mysimpletweets.models.User;
 import com.codepath.apps.mysimpletweets.network.TwitterApplication;
 import com.codepath.apps.mysimpletweets.network.TwitterClient;
+import com.daimajia.numberprogressbar.NumberProgressBar;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.parceler.Parcels;
-
-import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class TimelineActivity extends AppCompatActivity implements ComposeDialogFragment.ComposeDialogListener {
-    private TwitterClient client;
-    private ArrayList<Tweet> tweets;
-    private TweetsAdapter aTweets;
-    private RecyclerView rvTweets;
-    View.OnClickListener mOnClickListener;
-    private SwipeRefreshLayout swipeContainer;
+public class TimelineActivity extends AppCompatActivity implements ComposeDialogFragment.ComposeDialogListener{
+
     static final int COMPOSE_ACTIVITY = 1;
-    CircleImageView currentUserImage;
+    // Instance of the progress action-view
+    MenuItem miActionProgressItem;
+    NumberProgressBar progressBar;
+    private TwitterClient client;
     public User currentUser;
+    TweetsPagerAdapter tweetsPagerAdapter;
+    ViewPager vpPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timeline);
+        initialSetup();
 
+        //get view pager
+        vpPager = (ViewPager) findViewById(R.id.viewpager);
+        //pager adapter
+        tweetsPagerAdapter = new TweetsPagerAdapter(getSupportFragmentManager());
+        //set view adapter for pager
+        vpPager.setAdapter(tweetsPagerAdapter);
+
+        // find pager sliding tabstrip
+        PagerSlidingTabStrip tabStrip = (PagerSlidingTabStrip) findViewById(R.id.tabs);
+        //attach pager tabstrip to the view pager
+        tabStrip.setViewPager(vpPager);
+        tabStrip.setTextColor(Color.rgb(64,153,255));
+        tabStrip.setIndicatorColor(Color.rgb(64,153,255));
+    }
+
+    private void initialSetup(){
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        progressBar = (NumberProgressBar) findViewById(R.id.numberProgressBar);
+        hideProgressBar();
 
-        rvTweets = (RecyclerView) findViewById(R.id.rvTweets);
-        tweets = new ArrayList<>();
-        aTweets = new TweetsAdapter(this, tweets);
-        rvTweets.setAdapter(aTweets);
-        // Set layout manager to position the items
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        rvTweets.setLayoutManager(linearLayoutManager);
-
-        rvTweets.addOnScrollListener(new EndlessRecyclerViewScrollListener(linearLayoutManager) {
-            @Override
-            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                long max_id = tweets.get(tweets.size()-1).getUid();
-                client.setMax_id(max_id);
-                populateTimeline();
-            }
-        });
-
-        client = TwitterApplication.getRestClient(); // Singleton client
+        client = TwitterApplication.getRestClient();
         getCurrentUserDetails();
-        populateTimeline();
-        setSwipeToRefresh();
-
-        mOnClickListener = view -> {
-            tweets.clear();
-            populateTimeline();
-        };
+        //set the Floating action button for Compose activity
         setFAB();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_search, menu);
+        inflater.inflate(R.menu.menu_timeline, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
         Drawable drawable = searchItem.getIcon();
         drawable.setColorFilter(getResources().getColor(R.color.twitter_blue), PorterDuff.Mode.SRC_ATOP);
@@ -103,10 +99,13 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // perform query here
-                populateTimeline();
+                showProgressBar();
+                HomeTimelineFragment homeTimelineFragment= (HomeTimelineFragment)getCurrentFragment();
+                homeTimelineFragment.populateTimeline();
                 // workaround to avoid issues with some emulators and keyboard devices firing twice if a keyboard enter is used
                 // see https://code.google.com/p/android/issues/detail?id=24599
                 searchView.clearFocus();
+                hideProgressBar();
                 return true;
             }
 
@@ -115,96 +114,19 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
                 return false;
             }
         });
+
         return super.onCreateOptionsMenu(menu);
     }
 
-    private void getCurrentUserDetails(){
-        client.getCurrentUser(new JsonHttpResponseHandler(){
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
-                currentUser = User.fromJSON(response);
-                currentUserImage = (CircleImageView) findViewById(R.id.ivProfileImageToolbar);
-                currentUserImage.setImageResource(android.R.color.transparent);
-                Glide.with(getApplicationContext()).load(currentUser.getProfileImageUrl())
-                        .into(currentUserImage);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-                Snackbar.make(findViewById(R.id.contentTimeline), "Current user data not available", Snackbar.LENGTH_LONG)
-                        .show();
-            }
-        });
-    }
-    private void populateTimeline(){
-
-        client.getHomeTimeline(new JsonHttpResponseHandler(){
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray json) {
-                Log.d("DEBUG", json.toString());
-                if(json.length() == 0){
-                    Snackbar.make(findViewById(R.id.contentTimeline), "No data available", Snackbar.LENGTH_LONG)
-                            .show();
-                }
-                else {
-                    tweets.addAll(Tweet.fromJSONArray(json));
-
-                    // Now we call setRefreshing(false) to signal refresh has finished
-                    swipeContainer.setRefreshing(false);
-                    aTweets.notifyDataSetChanged();
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorObject) {
-                Log.d("DEBUG", "onResponseFailure");
-                if (!client.isNetworkAvailable()){
-                    Log.d("DEBUG: ", "Network not connected");
-                    Snackbar.make(findViewById(R.id.contentTimeline), "Network connectivity lost!", Snackbar.LENGTH_INDEFINITE)
-                        .setAction("RETRY", mOnClickListener)
-                        .setActionTextColor(Color.RED)
-                        .show();
-                }
-
-                if (!client.isOnline()) {
-                    Log.d("DEBUG: ", "Device not online. Check Internet connection!");
-                    Snackbar.make(findViewById(R.id.contentTimeline), "No internet connection!", Snackbar.LENGTH_INDEFINITE)
-                            .setAction("RETRY", mOnClickListener)
-                            .setActionTextColor(Color.RED)
-                            .show();
-                }
-            }
-        });
-    }
-
-    private void setSwipeToRefresh(){
-
-        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
-        // Setup refresh listener which triggers new data loading
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                // Your code to refresh the list here.
-                // Make sure you call swipeContainer.setRefreshing(false)
-                // once the network request has completed successfully.
-                populateTimeline();
-            }
-        });
-        // Configure the refreshing colors
-        swipeContainer.setProgressBackgroundColorSchemeColor(Color.rgb(64,153,255));
-        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
+    private Fragment getCurrentFragment(){
+        return tweetsPagerAdapter.getItem(vpPager.getCurrentItem());
     }
 
     private void setFAB(){
-       FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setSize(FloatingActionButton.SIZE_AUTO);
         fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.twitter_blue)));
-        Glide.with(getApplicationContext()).load(R.drawable.ic_action_compose)
+        Glide.with(this).load(R.drawable.ic_action_compose)
                 .diskCacheStrategy(DiskCacheStrategy.RESULT)
                 .into(fab);
         fab.setOnClickListener(view -> showComposeDialog());
@@ -216,19 +138,92 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
         ComposeDialogFragment composeDialogFragment = ComposeDialogFragment.newInstance(currentUser);
         composeDialogFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.Dialog_FullScreen);
         composeDialogFragment.setTargetFragment(composeDialogFragment, COMPOSE_ACTIVITY);
-
+        showProgressBar();
         composeDialogFragment.show(fm, "activity_compose");
     }
 
     @Override
     public void onFinishEditDialog(Bundle inputBundle) {
+        hideProgressBar();
 
-
-        Tweet newTweet = (Tweet) Parcels.unwrap(inputBundle.getParcelable("newTweet"));
-        tweets.add(0,newTweet);
-
-        aTweets.notifyDataSetChanged();
-        rvTweets.smoothScrollToPosition(0);
+        if(vpPager.getCurrentItem() != 0) {
+            vpPager.setCurrentItem(0);
+        }
+        Tweet newTweet = Parcels.unwrap(inputBundle.getParcelable("newTweet"));
+        HomeTimelineFragment homeTimelineFragment = (HomeTimelineFragment) getCurrentFragment();
+        homeTimelineFragment.addNewTweet(newTweet);
     }
 
+    // return order of fragments in viewpager
+    public class TweetsPagerAdapter extends FragmentPagerAdapter {
+        private String tabTitles[] = {"Home", "Mentions"};
+
+        // adapter gets manager used to insert and remove fragment frm activity
+        public TweetsPagerAdapter(FragmentManager fm){
+            super(fm);
+        }
+
+        //order and creation of fragments within the pager
+        @Override
+        public Fragment getItem(int position) {
+            if(position == 0)
+                return new HomeTimelineFragment();
+            else if (position == 1)
+                return new MentionsTimelineFragment();
+            else
+                return null;
+        }
+
+        // return tab title
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return tabTitles[position];
+        }
+
+        // how many fragments to swipe between
+        @Override
+        public int getCount() {
+            return tabTitles.length;
+        }
+    }
+
+    private void showProgressBar() {
+        // Show progress item
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgressBar() {
+        // Hide progress item
+        progressBar.setVisibility(View.INVISIBLE);
+    }
+
+
+    public void onProfileView(MenuItem mi){
+        Intent i = new Intent(this, ProfileActivity.class);
+        startActivity(i);
+    }
+
+
+    public void getCurrentUserDetails(){
+        client.getUserInfo(new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                currentUser = User.fromJSON(response);
+                Log.d("DEBUG: Current user - ", currentUser.toString());
+                CircleImageView currentUserImage = (CircleImageView) findViewById(R.id.ivProfileImageToolbar);
+                currentUserImage.setImageResource(android.R.color.transparent);
+                Glide.with(TimelineActivity.this).load(currentUser.getProfileImageUrl())
+                        .into(currentUserImage);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                currentUser = null;
+                Snackbar.make(findViewById(R.id.contentTimeline), "Current user data not available", Snackbar.LENGTH_LONG)
+                        .show();
+            }
+        });
+    }
 }

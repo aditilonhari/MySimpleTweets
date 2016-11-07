@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_profile"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/activity_horizontal_margin"
+    android:background="@color/background_white"
+    tools:context="com.codepath.apps.mysimpletweets.activities.ProfileActivity">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/rlUserHeader">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="@dimen/standard_profile_image_size"
+            android:layout_height="@dimen/standard_profile_image_size"
+            android:layout_marginRight="@dimen/border_layout"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:src="@android:drawable/screen_background_light_transparent"
+            android:id="@+id/ivProfileImageProfile" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvUserNameProfile"
+            android:textStyle="bold"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/ivProfileImageProfile"
+            android:text="@string/profile_name"
+            android:textSize="@dimen/standard_text_size"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvUserNameProfile"
+            android:layout_toRightOf="@+id/ivProfileImageProfile"
+            android:text="@string/profile_tagline"
+            android:textStyle="italic"
+            android:textSize="@dimen/standard_profile_text_size"
+            android:id="@+id/tvTaglineProfile" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/llCounts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/border_layout"
+        android:layout_below="@id/rlUserHeader"
+        android:orientation="horizontal">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvFollowers" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/border_layout"
+            android:id="@+id/tvFollowing" />
+
+    </LinearLayout>
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/llCounts"
+        android:background="@android:color/darker_gray"/>
+
+    <com.daimajia.numberprogressbar.NumberProgressBar
+        android:id="@+id/numberProgressBar"
+        android:layout_below="@id/divider"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+
+    <FrameLayout
+        android:id="@+id/flContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/numberProgressBar">
+
+    </FrameLayout>
+</RelativeLayout>
+

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/twitter_blue"
+    android:layout_margin="@dimen/border_layout">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/ivProfileImageDetail"
+        android:layout_width="@dimen/standard_image_size"
+        android:layout_height="@dimen/standard_image_size"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="@dimen/title_padding" />
+
+    <TextView
+        android:id="@+id/tvUserName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/title_padding"
+        android:text="Username"
+        android:textSize="@dimen/standard_text_size"
+        android:textStyle="bold"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/ivProfileImageDetail" />
+
+    <TextView
+        android:id="@+id/tvTwitterHandler"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/ivProfileImageDetail"
+        android:layout_below="@id/tvUserName"
+        android:text="Handler"
+        android:textSize="@dimen/standard_text_size"
+        android:textStyle="italic" />
+
+    <TextView
+        android:id="@+id/tvBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ivProfileImageDetail"
+        android:autoLink="all"
+        android:text="Body"
+        android:textColorLink="@color/twitter_blue"
+        android:linksClickable="true"
+        android:textSize="@dimen/standard_text_size" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvBody"
+        android:id="@+id/llTimePlace"
+        android:weightSum="2"
+        android:orientation="horizontal">
+    <TextView
+        android:id="@+id/tvCreatedDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Placeholder for Time"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:ellipsize="end"
+        android:gravity="end"
+        android:maxLines="1" />
+
+        <TextView
+            android:id="@+id/tvLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Placeholder for Location"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:id="@+id/divider1"
+        android:layout_below="@id/llTimePlace"
+        android:background="@android:color/darker_gray"/>
+
+    <LinearLayout
+        android:id="@+id/llRetweetAndLikes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/divider1"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tvRetweet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="@dimen/title_padding"
+            android:text="# of Retweets"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:text=" RETWEETS"/>
+
+        <TextView
+            android:id="@+id/tvLikes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="@dimen/title_padding"
+            android:text="# of likes"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" LIKES"/>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/llRetweetAndLikes"
+        android:background="@android:color/darker_gray"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_below="@id/divider2"
+        android:paddingTop="@dimen/title_padding"
+        android:weightSum="4"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/ibReply"
+            android:layout_width="@dimen/standard_icon_size"
+            android:layout_height="@dimen/standard_icon_size"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:background="@color/background_white"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_reply" />
+
+        <ImageButton
+            android:id="@+id/ibRetweet"
+            android:layout_width="@dimen/standard_icon_size"
+            android:layout_height="@dimen/standard_icon_size"
+            android:layout_weight="1"
+            android:background="@color/background_white"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_retweet" />
+
+        <ImageButton
+            android:id="@+id/ibLike"
+            android:layout_width="@dimen/standard_icon_size"
+            android:layout_height="@dimen/standard_icon_size"
+            android:layout_weight="1"
+            android:background="@color/background_white"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_empty_like" />
+
+        <ImageButton
+            android:gravity="center"
+            android:id="@+id/ibChat"
+            android:layout_width="@dimen/standard_icon_size"
+            android:layout_height="@dimen/standard_icon_size"
+            android:layout_weight="1"
+            android:background="@color/background_white"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_email" />
+
+    </LinearLayout>
+
+</RelativeLayout>

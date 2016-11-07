@@ -40,6 +40,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="@dimen/title_padding"
+                    android:paddingLeft="@dimen/title_padding"
                     android:layout_toRightOf="@id/ivProfileImageToolbar"
                     android:layout_alignBottom="@id/ivProfileImageToolbar"
                     android:text="@string/toolbar_title"

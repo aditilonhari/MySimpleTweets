@@ -1,4 +1,4 @@
-package com.codepath.apps.mysimpletweets.fragment;
+package com.codepath.apps.mysimpletweets.fragments;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -76,8 +76,8 @@ public class ComposeDialogFragment extends DialogFragment implements TextView.On
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         getDialog().setTitle("Compose Tweet");
-        User currentUser = (User) Parcels.unwrap(getArguments().getParcelable("user"));
-
+        User currentUser = Parcels.unwrap(getArguments().getParcelable("user"));
+        Log.d("DEBUG Current Compose", currentUser.toString());
         tvUsernameCompose = (TextView) view.findViewById(R.id.tvUserNameCompose);
         tvTwitterHandlerCompose = (TextView) view.findViewById(R.id.tvTwitterHandlerCompose);
         tvCounterCompose = (TextView) view.findViewById(R.id.tvCounterCompose);

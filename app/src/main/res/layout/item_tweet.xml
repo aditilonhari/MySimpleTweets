@@ -1,63 +1,138 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_margin="@dimen/border_layout">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignParentTop="true"
+        android:id="@+id/ivProfileImage"
+        android:layout_width="@dimen/standard_image_size"
+        android:layout_height="@dimen/standard_image_size"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_margin="5dp"
-        android:id="@+id/ivProfileImage" />
+        android:layout_alignParentTop="true"
+        android:layout_margin="@dimen/title_padding" />
 
     <TextView
+        android:id="@+id/tvUserName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/tvUserName"
-        android:textStyle="bold"
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/ivProfileImage"
-        android:paddingBottom="5dp"/>
+        android:paddingBottom="@dimen/title_padding"
+        android:textSize="@dimen/standard_text_size"
+        android:textStyle="bold" />
 
 
     <TextView
+        android:id="@+id/tvBody"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvUserName"
         android:layout_toRightOf="@+id/ivProfileImage"
-        android:layout_toEndOf="@id/ivProfileImage"
         android:autoLink="all"
+        android:textColorLink="@color/twitter_blue"
         android:linksClickable="true"
-        android:id="@+id/tvBody" />
+        android:textSize="@dimen/standard_text_size" />
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/tvUserName"
-        android:layout_toEndOf="@+id/tvUserName"
-        android:layout_above="@id/tvBody"
         android:id="@+id/tvTwitterHandler"
-        android:textStyle="italic"/>
-
-    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_above="@id/tvBody"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/tvUserName"
+        android:layout_toRightOf="@+id/tvUserName"
+        android:textSize="@dimen/standard_text_size"
+        android:textStyle="italic" />
+
+    <TextView
+        android:id="@+id/tvCreatedDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/tvBody"
         android:layout_alignParentTop="true"
         android:layout_alignRight="@id/tvBody"
-        android:layout_toRightOf="@+id/tvTwitterHandler"
         android:layout_toEndOf="@+id/tvUserName"
-        android:layout_above="@id/tvBody"
-        android:textColor="@android:color/holo_red_dark"
-        android:maxLines="1"
+        android:layout_toRightOf="@+id/tvTwitterHandler"
         android:ellipsize="end"
         android:gravity="end"
-        android:id="@+id/tvCreatedDate" />
+        android:maxLines="1" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="30dp"
+        android:layout_alignLeft="@id/tvBody"
+        android:layout_below="@id/tvBody"
+        android:layout_toEndOf="@id/ivProfileImage"
+        android:layout_toRightOf="@id/ivProfileImage"
+        android:paddingTop="@dimen/title_padding"
+        android:weightSum="4"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/ibReply"
+            android:layout_width="@dimen/standard_icon_size"
+            android:layout_height="@dimen/standard_icon_size"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:background="@color/background_white"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_reply" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1">
+
+        <ImageButton
+            android:id="@+id/ibRetweet"
+            android:layout_width="@dimen/standard_icon_size"
+            android:layout_height="@dimen/standard_icon_size"
+            android:background="@color/background_white"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_retweet" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/title_padding"
+            android:id="@+id/tvRetweetCount"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="1">
+            <ImageButton
+                android:id="@+id/ibLike"
+                android:layout_width="@dimen/standard_icon_size"
+                android:layout_height="@dimen/standard_icon_size"
+                android:background="@color/background_white"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_empty_like" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/title_padding"
+                android:id="@+id/tvLikeCount"/>
+        </LinearLayout>
+
+
+        <ImageButton
+            android:gravity="center"
+            android:id="@+id/ibChat"
+            android:layout_width="@dimen/standard_icon_size"
+            android:layout_height="@dimen/standard_icon_size"
+            android:layout_weight="1"
+            android:background="@color/background_white"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_email" />
+
+    </LinearLayout>
 
 </RelativeLayout>

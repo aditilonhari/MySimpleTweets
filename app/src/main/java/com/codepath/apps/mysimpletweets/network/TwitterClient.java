@@ -3,10 +3,10 @@ package com.codepath.apps.mysimpletweets.network;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.Log;
 
 import com.codepath.oauth.OAuthBaseClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import org.scribe.builder.api.Api;
@@ -29,10 +29,10 @@ import java.io.IOException;
 public class TwitterClient extends OAuthBaseClient {
 	public static final Class<? extends Api> REST_API_CLASS = TwitterApi.class; // Change this
 	public static final String REST_URL = "https://api.twitter.com/1.1/"; // Change this, base API URL
-	//public static final String REST_CONSUMER_KEY = "rhHH3lbQjft8pPFcv9D3iFscu";       // Change this
-	public static final String REST_CONSUMER_KEY = "MlZWQPfUBTDcEJfxDf9Mm43ba";       // Change this
-	//public static final String REST_CONSUMER_SECRET = "6uVh3xViQlr3JMmZ7b5a2k01R4GBz7trSBhSQdOzc0HEjPd7JE"; // Change this
-	public static final String REST_CONSUMER_SECRET = "Ncpy4WZy56Ukn5vrzH1yi2kzJZCfyrvNFiLpfWfBBvguWKyNWJ"; // Change this
+	//public static final String REST_CONSUMER_KEY = "rhHH3lbQjft8pPFcv9D3iFscu";       // (my account)
+	public static final String REST_CONSUMER_KEY = "MlZWQPfUBTDcEJfxDf9Mm43ba";       // (ned's account)
+	//public static final String REST_CONSUMER_SECRET = "6uVh3xViQlr3JMmZ7b5a2k01R4GBz7trSBhSQdOzc0HEjPd7JE"; // (my account)
+	public static final String REST_CONSUMER_SECRET = "Ncpy4WZy56Ukn5vrzH1yi2kzJZCfyrvNFiLpfWfBBvguWKyNWJ"; // (ned's account)
 	public static final String REST_CALLBACK_URL = "oauth://cpsimpletweets"; // Change this (here and in manifest)
 
 	private long max_id;
@@ -51,10 +51,18 @@ public class TwitterClient extends OAuthBaseClient {
 	}
 
 	// GET Method
-	public void getCurrentUser(AsyncHttpResponseHandler handler){
+	public void getUserInfo(AsyncHttpResponseHandler handler){
 		String apiUrl = getApiUrl("account/verify_credentials.json");
-		Log.d("DEBUG", apiUrl);
-		getClient().get(apiUrl, handler);
+		getClient().get(apiUrl, null, handler);
+	}
+
+
+	// GET Method
+	public void getClickedUserInfo(String userScreenName, AsyncHttpResponseHandler handler){
+		String apiUrl = getApiUrl("users/show.json");
+		RequestParams params = new RequestParams();
+		params.put("screen_name", userScreenName);
+		getClient().get(apiUrl, params, handler);
 	}
 
 	public void updateStatus(String status, AsyncHttpResponseHandler handler){
@@ -70,7 +78,7 @@ public class TwitterClient extends OAuthBaseClient {
 		params.put("count", 50);
 		params.put("since_id", 1);
 		if(max_id != -1)
-				params.put("max_id", max_id);
+			params.put("max_id", String.valueOf(max_id));
 		getClient().get(apiUrl, params, handler);
 	}
 
@@ -91,7 +99,24 @@ public class TwitterClient extends OAuthBaseClient {
 		return false;
 	}
 
+	public void getMentionsTimeline(JsonHttpResponseHandler jsonHttpResponseHandler) {
+		String apiUrl = getApiUrl("statuses/mentions_timeline.json");
+		RequestParams params = new RequestParams();
+		params.put("count", 3);
+		if(max_id != -1)
+			params.put("max_id", String.valueOf(max_id));
+		getClient().get(apiUrl, params, jsonHttpResponseHandler);
+	}
 
+	public void getUserTimeLine(String userScreenName, AsyncHttpResponseHandler handler){
+		String apiUrl = getApiUrl("statuses/user_timeline.json");
+		RequestParams params = new RequestParams();
+		params.put("screen_name", userScreenName);
+		params.put("count", 50);
+		if(max_id != -1)
+			params.put("max_id", String.valueOf(max_id));
+		getClient().get(apiUrl, params, handler);
+	}
 
 
 	/* 1. Define the endpoint URL with getApiUrl and pass a relative path to the endpoint

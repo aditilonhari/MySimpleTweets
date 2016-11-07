@@ -1,4 +1,4 @@
-package com.codepath.apps.mysimpletweets.adapters;
+package com.codepath.apps.mysimpletweets.utilities;
 
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
